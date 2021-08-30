@@ -37,6 +37,10 @@ namespace SlideShowCreator {
         private void addChecked_Click(object sender, RoutedEventArgs e) {
             foreach(var r in vm.Results.Where(res=>res.IsChecked)) mvm.SlideInfos.Add(new SlideInfo() { Path = r.Path });
         }
+
+        private void clearItems_Click(object sender, RoutedEventArgs e) {
+            vm.Results.Clear();
+        }
         #endregion
 
         #region DragAndDrop
@@ -53,11 +57,10 @@ namespace SlideShowCreator {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effects = DragDropEffects.Copy;
         }
 
-        private void DataGrid_Drop(object sender, DragEventArgs e) {
+        private async void DataGrid_Drop(object sender, DragEventArgs e) {
             var ds = (string[])e.Data.GetData(DataFormats.FileDrop);
-            foreach (var d in ds) {
-                SearchDirectory(d, vm.Condition);
-            }
+            foreach (var d in ds)
+                await StarSearchAsync(d, vm.Condition);
         }
         #endregion
 
@@ -67,17 +70,13 @@ namespace SlideShowCreator {
                 foreach (var i in vm.Results) i.IsChecked = allCheck.IsChecked.Value;
         }
 
-        private void searchBtn_Click(object sender, RoutedEventArgs e) {
+        private async void searchBtn_Click(object sender, RoutedEventArgs e) {
             if (start) {
                 ChangeStart();
             } else {
                 if (!Directory.Exists(vm.DirPath)) return;
-                SearchDirectory(vm.DirPath, vm.Condition);
+                await StarSearchAsync(vm.DirPath, vm.Condition);
             }
-        }
-
-        private void clearBtn_Click(object sender, RoutedEventArgs e) {
-            vm.Results.Clear();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -86,6 +85,9 @@ namespace SlideShowCreator {
         #endregion
 
         bool start = false;
+        private async Task StarSearchAsync(string dirPath, string cond) {
+            await Task.Run(() => SearchDirectory(dirPath, cond));
+        }
         private void SearchDirectory(string dirPath,string cond, int? cnt = null) {
             if (!Directory.Exists(dirPath)) return;
             if (cnt == null) ChangeStart();
@@ -94,7 +96,8 @@ namespace SlideShowCreator {
             foreach (var f in Directory.GetFiles(dirPath)) {
                 if (!start) return;
                 if (string.IsNullOrEmpty(cond.Trim()) || Regex.IsMatch(f, cond.Trim()))
-                    if (!vm.Results.Select(r => r.Path).Contains(f)) vm.Results.Add(new SearchResult() { Path = f });
+                    if (!vm.Results.Select(r => r.Path).Contains(f))
+                        Dispatcher.Invoke(() => { vm.Results.Add(new SearchResult() { Path = f }); });
             }
 
             //フォルダ
@@ -108,8 +111,10 @@ namespace SlideShowCreator {
         }
 
         private void ChangeStart() {
-            start = !start;
-            searchBtn.Content = start ? "Stop" : "Search";
+            Dispatcher.Invoke(() => {
+                start = !start;
+                searchBtn.Content = start ? "Stop" : "Search";
+            });
         }
 
         private void dataGrid1_MouseDoubleClick(object sender, MouseButtonEventArgs e) {

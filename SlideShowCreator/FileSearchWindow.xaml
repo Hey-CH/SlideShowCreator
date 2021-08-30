@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SlideShowCreator"
         mc:Ignorable="d"
-        Title="File Search" Height="450" Width="800" Closing="Window_Closing" AllowDrop="True">
+        Title="File Search" Height="450" Width="800" Closing="Window_Closing" AllowDrop="True" Icon="/Resources/SlideShowCreator.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -26,11 +26,9 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Condition:"/>
             <TextBox Grid.Column="1" Text="{Binding Condition}"/>
-            <Button Grid.Column="2" x:Name="clearBtn" Content="Clear items" Click="clearBtn_Click"/>
         </Grid>
         <DataGrid x:Name="dataGrid1" Grid.Row="2" ItemsSource="{Binding Results}" SelectionMode="Extended" CanUserAddRows="False" AutoGenerateColumns="False"
                   AllowDrop="True" DragEnter="DataGrid_DragEnter" Drop="DataGrid_Drop" MouseDoubleClick="dataGrid1_MouseDoubleClick">
@@ -38,6 +36,7 @@
                 <ContextMenu>
                     <MenuItem x:Name="addSelected" Header="Add selected" Click="addSelected_Click"/>
                     <MenuItem x:Name="addChecked" Header="Add checked" Click="addChecked_Click"/>
+                    <MenuItem x:Name="clearItems" Header="Clear items" Click="clearItems_Click"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
@@ -48,7 +47,7 @@
                         </StackPanel>
                     </DataGridCheckBoxColumn.Header>
                 </DataGridCheckBoxColumn>
-                <DataGridTemplateColumn Header="Thumbnail">
+                <DataGridTemplateColumn Header="Thumbnail" MaxWidth="200">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding Thumbnail}"/>
