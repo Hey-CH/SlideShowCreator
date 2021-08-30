@@ -1,0 +1,74 @@
+﻿<Window x:Class="SlideShowCreator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SlideShowCreator"
+        mc:Ignorable="d"
+        Title="Slide Show Creator" Height="450" Width="800" Closing="Window_Closing">
+    <Window.Resources>
+        <Style x:Key="textBoxInError" TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip"
+                            Value="{Binding RelativeSource={x:Static RelativeSource.Self},
+                        Path=(Validation.Errors)[0].ErrorContent}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="25"/>
+                <ColumnDefinition Width="40"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding SettingPath}"/>
+            <Button x:Name="openBtn" Grid.Column="1" Content="..." Click="openBtn_Click"/>
+            <Button x:Name="saveBtn" Grid.Column="2" Content="Save" Click="saveBtn_Click"/>
+        </Grid>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <TextBox Text="{Binding Wait, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" MinWidth="60" Style="{StaticResource textBoxInError}"/>
+            <Button x:Name="setWaitBtn" Content="Set all wait" Click="setWaitBtn_Click"/>
+            <Label Content="Show window background > Opacity:"/>
+            <TextBox Text="{Binding Opacity, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" MinWidth="30" Style="{StaticResource textBoxInError}"/>
+            <Label Content="R:"/>
+            <TextBox Text="{Binding R, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" MinWidth="30" Style="{StaticResource textBoxInError}"/>
+            <Label Content="G:"/>
+            <TextBox Text="{Binding G, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" MinWidth="30" Style="{StaticResource textBoxInError}"/>
+            <Label Content="B:"/>
+            <TextBox Text="{Binding B, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" MinWidth="30" Style="{StaticResource textBoxInError}"/>
+        </StackPanel>
+        <DataGrid x:Name="dataGrid1" Grid.Row="2" ItemsSource="{Binding SlideInfos}" SelectedIndex="{Binding SelectedIndex}"
+                  CanUserAddRows="False" AutoGenerateColumns="False" SelectionMode="Single"
+                  AllowDrop="True" DragEnter="DataGrid_DragEnter" Drop="DataGrid_Drop"
+                  >
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Slide Setting" Click="SlideSetting_Click"/>
+                    <MenuItem Header="Start Show" Click="StartShow_Click"/>
+                    <Separator />
+                    <MenuItem Header="File Search" Click="FileSearch_Click"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="ToolTip" Value="{Binding Path}"/>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name,Mode=OneWay}"/>
+                <DataGridTextColumn Header="Scale" Binding="{Binding Scale,Mode=OneWay}"/>
+                <DataGridTextColumn Header="OffsetX" Binding="{Binding OffsetX,Mode=OneWay}"/>
+                <DataGridTextColumn Header="OffsetY" Binding="{Binding OffsetY,Mode=OneWay}"/>
+                <DataGridTextColumn Header="Wait(ms)" Binding="{Binding Wait,UpdateSourceTrigger=PropertyChanged}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
