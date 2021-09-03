@@ -50,7 +50,7 @@
                 <DataGridTemplateColumn Header="Thumbnail" MaxWidth="200">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image Source="{Binding Thumbnail}"/>
+                            <Image Source="{Binding Thumbnail}" MinHeight="150"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
