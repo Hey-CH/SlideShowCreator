@@ -4,10 +4,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Serialization;
 
@@ -136,8 +139,8 @@ namespace SlideShowCreator {
             }
         }
         public string Path { get; set; }
-        BitmapImage _Thumbnail;
-        public BitmapImage Thumbnail {
+        BitmapSource _Thumbnail;
+        public BitmapSource Thumbnail {
             get {
                 if (_Thumbnail == null) _Thumbnail = Common.GetBitmapImage(Path, 100);
                 return _Thumbnail;
@@ -187,16 +190,41 @@ namespace SlideShowCreator {
         #endregion
     }
     public static class Common {
-        public static BitmapImage GetBitmapImage(string path, int? decodePixelHeight = null) {
-            BitmapImage bmp;
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-                bmp = new BitmapImage();
-                bmp.BeginInit();
-                bmp.StreamSource = stream;
-                if (decodePixelHeight != null) bmp.DecodePixelHeight = decodePixelHeight.Value;
-                bmp.CacheOption = BitmapCacheOption.OnLoad;
-                bmp.EndInit();
-                bmp.Freeze();
+        public static BitmapSource GetBitmapImage(string path, int? decodePixelHeight = null) {
+            BitmapSource bmp;
+            try {
+                var tmp = new BitmapImage();
+                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+                    tmp.BeginInit();
+                    tmp.StreamSource = stream;
+                    if (decodePixelHeight != null) tmp.DecodePixelHeight = decodePixelHeight.Value;
+                    tmp.CacheOption = BitmapCacheOption.OnLoad;
+                    tmp.EndInit();
+                    tmp.Freeze();
+                }
+                bmp = tmp;
+            } catch(Exception ex) {
+                var size = 500;
+                var msg = "An error occurred when reading the image.\r\n" + ex.Message + "\r\n" + path;
+                var visual = new DrawingVisual();
+                using (DrawingContext drawingContext = visual.RenderOpen()) {
+                    drawingContext.DrawRectangle(
+                                        System.Windows.Media.Brushes.Black,
+                                        new System.Windows.Media.Pen(System.Windows.Media.Brushes.Black, 100.0),
+                                        new System.Windows.Rect(0, 0, size, size));
+                    var ft = new FormattedText(msg,
+                                            CultureInfo.CurrentCulture,
+                                            FlowDirection.LeftToRight,
+                                            new Typeface(System.Windows.SystemFonts.MessageFontFamily.Source),
+                                            24.0,
+                                            System.Windows.Media.Brushes.White,
+                                            1.0);
+                    ft.MaxTextWidth = size-20;
+                    drawingContext.DrawText(ft, new System.Windows.Point(10.0, 10.0));
+                }
+                var rtb = new RenderTargetBitmap(size, size, 96, 96, PixelFormats.Pbgra32);
+                rtb.Render(visual);
+                bmp = rtb;
             }
             return bmp;
         }

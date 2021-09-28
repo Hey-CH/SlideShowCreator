@@ -97,12 +97,26 @@ namespace SlideShowCreator {
         }
         private void Next() {
             if (showMode == ShowMode.OnlyView) return;
-
+            var tmp = currentIndex;
             currentIndex += 1;
             if (currentIndex >= vm.SlideInfos.Count) currentIndex = 0;
             if (startIndex == currentIndex) {
                 if (!IsRoop) {
                     if (showMode == ShowMode.Single) MessageBox.Show("This is the last item.", "Not Roop");
+                    currentIndex = tmp;
+                    return;
+                }
+            }
+        }
+        private void Prev() {
+            if (showMode == ShowMode.OnlyView) return;
+            var tmp = currentIndex;
+            currentIndex -= 1;
+            if (currentIndex < 0) currentIndex = vm.SlideInfos.Count - 1;
+            if (startIndex == currentIndex) {
+                if (!IsRoop) {
+                    if (showMode == ShowMode.Single) MessageBox.Show("This is the first item.", "Not Roop");
+                    currentIndex = tmp;
                     return;
                 }
             }
@@ -114,12 +128,24 @@ namespace SlideShowCreator {
                 image1.Source = Common.GetBitmapImage(vm.SlideInfos[currentIndex].Path);
 
                 var matrix = image1.RenderTransform.Value;
-                matrix.M11 = vm.SlideInfos[currentIndex].Scale;
+                var s = vm.SlideInfos[currentIndex].Scale;
+                var x = vm.SlideInfos[currentIndex].OffsetX;
+                var y = vm.SlideInfos[currentIndex].OffsetY;
+                if (vm.SlideInfos[currentIndex].Scale == 1.0 && vm.SlideInfos[currentIndex].OffsetX == 0 && vm.SlideInfos[currentIndex].OffsetY == 0) {
+                    var sw = (double)SystemParameters.PrimaryScreenWidth / (double)image1.Source.Width;
+                    var sh = (double)SystemParameters.PrimaryScreenHeight / (double)image1.Source.Height;
+                    if (sw < 0) sw = double.MaxValue;
+                    if (sh < 0) sh = double.MaxValue;
+                    s = sw > sh ? sh : sw;
+                    x = sw > sh ? (SystemParameters.PrimaryScreenWidth - image1.Source.Width * s) / 2 : 0;
+                    y = sw > sh ? 0 : (SystemParameters.PrimaryScreenHeight - image1.Source.Height * s) / 2;
+                }
+                matrix.M11 = s;
                 matrix.M12 = 0.0;
                 matrix.M21 = 0.0;
-                matrix.M22 = vm.SlideInfos[currentIndex].Scale;
-                matrix.OffsetX = vm.SlideInfos[currentIndex].OffsetX;
-                matrix.OffsetY = vm.SlideInfos[currentIndex].OffsetY;
+                matrix.M22 = s;
+                matrix.OffsetX = x;
+                matrix.OffsetY = y;
                 image1.RenderTransform = new MatrixTransform(matrix);
             });
         }
@@ -201,6 +227,12 @@ namespace SlideShowCreator {
             else if (e.Key == Key.Space) {
                 Save();
                 Next();
+                Shows();
+            } else if (e.Key == Key.Right) {
+                Next();
+                Shows();
+            } else if (e.Key == Key.Left || e.Key == Key.Back) {
+                Prev();
                 Shows();
             }
         }
