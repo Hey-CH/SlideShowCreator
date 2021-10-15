@@ -44,6 +44,7 @@
             <TextBox Text="{Binding G, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" MinWidth="30" Style="{StaticResource textBoxInError}"/>
             <Label Content="B:"/>
             <TextBox Text="{Binding B, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" MinWidth="30" Style="{StaticResource textBoxInError}"/>
+            <Button x:Name="clearAllBtn" Content="Clear All" Click="clearAllBtn_Click" Margin="30,0,0,0"/>
         </StackPanel>
         <DataGrid x:Name="dataGrid1" Grid.Row="2" ItemsSource="{Binding SlideInfos}" SelectedIndex="{Binding SelectedIndex}"
                   CanUserAddRows="False" AutoGenerateColumns="False" SelectionMode="Single"

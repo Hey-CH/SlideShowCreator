@@ -111,6 +111,10 @@ namespace SlideShowCreator {
         private void setWaitBtn_Click(object sender, RoutedEventArgs e) {
             foreach (var si in vm.SlideInfos) si.Wait = vm.Wait;
         }
+
+        private void clearAllBtn_Click(object sender, RoutedEventArgs e) {
+            vm.SlideInfos.Clear();
+        }
         #endregion
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
