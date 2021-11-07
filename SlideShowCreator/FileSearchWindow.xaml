@@ -37,6 +37,8 @@
                     <MenuItem x:Name="addSelected" Header="Add selected" Click="addSelected_Click"/>
                     <MenuItem x:Name="addChecked" Header="Add checked" Click="addChecked_Click"/>
                     <MenuItem x:Name="clearItems" Header="Clear items" Click="clearItems_Click"/>
+                    <Separator/>
+                    <MenuItem x:Name="scrollNext" Header="Scroll Next" Click="scrollNext_Click"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>

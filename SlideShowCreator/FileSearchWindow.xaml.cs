@@ -41,6 +41,33 @@ namespace SlideShowCreator {
         private void clearItems_Click(object sender, RoutedEventArgs e) {
             vm.Results.Clear();
         }
+
+        private void scrollNext_Click(object sender, RoutedEventArgs e) {
+            var rowIndex = -1;
+            var mouseP = CalcPoint(Mouse.GetPosition(this), dataGrid1.TransformToAncestor(this).Transform(new Point(0, 0)));
+            var hitRes = VisualTreeHelper.HitTest(dataGrid1, mouseP);
+            if (hitRes != null) {
+                var obj = hitRes.VisualHit;
+                while (obj != null) {
+                    if (obj is DataGridRow) {
+                        rowIndex = ((DataGridRow)obj).GetIndex();
+                        break;
+                    }
+                    obj = VisualTreeHelper.GetParent(obj);
+                }
+            }
+            if (rowIndex < 0 || rowIndex >= vm.Results.Count - 1) return;
+
+            var d1 = new FileInfo(vm.Results[rowIndex].Path).Directory;
+            var i = rowIndex + 1;
+            for (; i < vm.Results.Count; i++) {
+                var d2 = new FileInfo(vm.Results[i].Path).Directory;
+                if (d1.FullName.ToLower() != d2.FullName.ToLower()) break;
+            }
+
+            dataGrid1.SelectedItem = vm.Results[i];
+            dataGrid1.ScrollIntoView(vm.Results[i]);
+        }
         #endregion
 
         #region DragAndDrop
@@ -115,6 +142,13 @@ namespace SlideShowCreator {
                 start = !start;
                 searchBtn.Content = start ? "Stop" : "Search";
             });
+        }
+
+        private Point CalcPoint(Point p1, Point p2, bool isMinus = true) {
+            if (isMinus)
+                return new Point(p1.X - p2.X, p1.Y - p2.Y);
+            else
+                return new Point(p1.X + p2.X, p1.Y + p2.Y);
         }
 
         private void dataGrid1_MouseDoubleClick(object sender, MouseButtonEventArgs e) {
