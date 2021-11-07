@@ -59,14 +59,14 @@ namespace SlideShowCreator {
             if (rowIndex < 0 || rowIndex >= vm.Results.Count - 1) return;
 
             var d1 = new FileInfo(vm.Results[rowIndex].Path).Directory;
-            var i = rowIndex + 1;
-            for (; i < vm.Results.Count; i++) {
+            for (int i = rowIndex + 1; i < vm.Results.Count; i++) {
                 var d2 = new FileInfo(vm.Results[i].Path).Directory;
-                if (d1.FullName.ToLower() != d2.FullName.ToLower()) break;
+                if (d1.FullName.ToLower() != d2.FullName.ToLower()) {
+                    dataGrid1.SelectedItem = vm.Results[i];
+                    dataGrid1.ScrollIntoView(vm.Results[i]);
+                    break;
+                }
             }
-
-            dataGrid1.SelectedItem = vm.Results[i];
-            dataGrid1.ScrollIntoView(vm.Results[i]);
         }
         #endregion
 
